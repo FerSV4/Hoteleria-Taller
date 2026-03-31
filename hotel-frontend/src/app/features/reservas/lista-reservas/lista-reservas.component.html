@@ -1,0 +1,65 @@
+<div class="header-seccion">
+  <div class="header-titulos">
+    <h2>Reservas</h2>
+    <p>Lista de reservas y estadia.</p>
+  </div>
+  <button class="btn btn-primary" routerLink="/reservas/nueva">Nueva Reserva</button>
+</div>
+
+@if (carga) {
+  <div class="estado-mensaje">
+    <p>carga</p>
+  </div>
+} @else {
+  @if (reservas.length === 0) {
+    <div class="estado-mensaje vacio">
+      <p>{{ msjVacio }}</p>
+    </div>
+  } @else {
+    <div class="tarjeta tabla-contenedor">
+      <table class="tabla-reservas">
+        <thead>
+          <tr>
+            <th>Huésped</th>
+            <th>Hab.</th>
+            <th>Ingreso</th>
+            <th>Salida</th>
+            <th>Personas</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (reserva of reservas; track reserva.id) {
+            <tr>
+              <td>
+                <div class="dato-principal">{{ reserva.huesped.nombre_completo }}</div>
+                <div class="dato-secundario">{{ reserva.huesped.documento }}</div>
+              </td>
+              <td>
+                <div class="dato-principal">#{{ reserva.habitacion.numero }}</div>
+                <div class="dato-secundario">{{ reserva.habitacion.tipo }}</div>
+              </td>
+              <td>{{ reserva.fecha_ingreso | date:'dd/MM/yyyy' }}</td>
+              <td>{{ reserva.fecha_salida | date:'dd/MM/yyyy' }}</td>
+              <td>{{ reserva.cantidad_personas }}</td>
+              <td>
+                <span class="badge" [class.badge-reserva]="reserva.estado === 'Reservada'" 
+                  [class.badge-curso]="reserva.estado === 'En curso'">
+                  {{ reserva.estado }}
+                </span>
+              </td>
+              <td>
+                @if (reserva.estado === 'Reservada') {
+                  <button class="btn btn-checkin" (click)="ejecutarCheckIn(reserva.id)">
+                    Check-in
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+}

@@ -1,0 +1,58 @@
+<div class="header-seccion">
+  <h2>Registrar Nuevo Huésped</h2>
+  <p>Ingrese los datos personales del huesped.</p>
+</div>
+
+<div class="tarjeta form-container">
+  <form [formGroup]="formulario" (ngSubmit)="registrar()">
+
+    <div class="form-grid">
+      <div class="form-columna">
+        <div class="form-group">
+          <label>CI *</label>
+          <input type="text" class="form-control" formControlName="documento" placeholder="Ci">
+          @if (formulario.get('documento')?.invalid && formulario.get('documento')?.touched) {
+            <span class="text-error">El Carnet es obligatorio.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Nombre Completo *</label>
+          <input type="text" class="form-control" formControlName="nombre_completo" placeholder="Nombre y Apellido">
+          @if (formulario.get('nombre_completo')?.invalid && formulario.get('nombre_completo')?.touched) {
+            <span class="text-error">El nombre es obligatorio</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-columna">
+        <div class="form-group">
+          <label>Telf de Contacto</label>
+          <input type="text" class="form-control" formControlName="telefono" placeholder="xxxxxxxx">
+        </div>
+
+        <div class="form-group">
+          <label>Correo Electrónico</label>
+          <input type="email" class="form-control" formControlName="correo" placeholder="alguien@correo.com">
+          @if (formulario.get('correo')?.invalid && formulario.get('correo')?.touched) {
+            <span class="text-error">Ingrese un correo valido</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    @if (msjExito) {
+      <div class="alerta alerta-exito">{{ msjExito }}</div>
+    }
+    @if (msjError) {
+      <div class="alerta alerta-error">{{ msjError }}</div>
+    }
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="cargando">
+        {{ cargando ? 'EnProceso' : 'RegistrarHuesped' }}
+      </button>
+    </div>
+
+  </form>
+</div>

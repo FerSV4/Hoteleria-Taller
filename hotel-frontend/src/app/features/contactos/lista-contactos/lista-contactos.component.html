@@ -1,0 +1,30 @@
+<div class="header-seccion">
+  <h2>Directorio de Servicios Internos</h2>
+  <p>Contactos del hotel segun departamento</p>
+</div>
+
+@if (cargando) {
+  <div class="estado-mensaje">
+    <p>...</p>
+  </div>
+} @else {
+  @if (contactos.length === 0) {
+    <div class="estado-mensaje vacio">
+      <p>{{ mensajeVacio }}</p>
+    </div>
+  } @else {
+    <div class="grid-tarjetas">
+      @for (contacto of contactos; track contacto.id) {
+        <div class="tarjeta-contacto">
+          <div class="tarjeta-header">
+            <h3>{{ contacto.nombre_servicio }}</h3>
+          </div>
+          <div class="tarjeta-body">
+            <p><strong>Encargado:</strong> {{ contacto.encargado }}</p>
+            <p class="telefono"><strong>Teléfono:</strong> {{ contacto.telefono }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+}

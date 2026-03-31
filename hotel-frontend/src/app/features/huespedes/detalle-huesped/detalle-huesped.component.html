@@ -1,0 +1,55 @@
+<div class="header-seccion">
+  <h2>Consulta de Huéspedes</h2>
+  <p>Busqueda de informacion mediante el carnet</p>
+</div>
+
+<div class="tarjeta buscador-container">
+  <div class="search-box">
+    <input 
+      type="text" 
+      class="form-control" 
+      placeholder="Ingrese el numero de carnet" 
+      [formControl]="buscadorControl"
+      (keyup.enter)="buscar()"
+    >
+    <button class="btn btn-primary" (click)="buscar()" [disabled]="cargando">
+      {{ cargando ? 'EnProceso' : 'Buscar' }}
+    </button>
+  </div>
+  @if (buscadorControl.invalid && buscadorControl.touched) {
+    <span class="text-error">Ingrese un carnet valido.</span>
+  }
+</div>
+
+@if (mensajeError) {
+  <div class="estado-mensaje vacio" style="margin-top: 20px;">
+    <p>{{ mensajeError }}</p>
+  </div>
+}
+
+@if (huespedEncontrado) {
+  <div class="tarjeta resultado-card">
+    <div class="resultado-header">
+      <h3>Datos del Huésped</h3>
+      <span class="badge">Registrado</span>
+    </div>
+    <div class="resultado-body">
+      <div class="dato-grupo">
+        <label>Nombre Completo</label>
+        <p>{{ huespedEncontrado.nombre_completo }}</p>
+      </div>
+      <div class="dato-grupo">
+        <label>Documento de Identidad</label>
+        <p>{{ huespedEncontrado.documento }}</p>
+      </div>
+      <div class="dato-grupo">
+        <label>Teléfono de Contacto</label>
+        <p>{{ huespedEncontrado.telefono || 'No registrado' }}</p>
+      </div>
+      <div class="dato-grupo">
+        <label>Correo Electrónico</label>
+        <p>{{ huespedEncontrado.correo || 'No registrado' }}</p>
+      </div>
+    </div>
+  </div>
+}

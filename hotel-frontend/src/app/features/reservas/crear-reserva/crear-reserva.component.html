@@ -1,0 +1,75 @@
+<div class="header-seccion">
+  <h2>Nueva Reserva</h2>
+  <p>Asigne una habitación a un huesped, indique los datos a continuacion.</p>
+</div>
+
+<div class="tarjeta form-container">
+  <form [formGroup]="formulario" (ngSubmit)="registrarReserva()">
+
+    <div class="form-grid">
+      <div class="form-columna">
+        <div class="form-group row-ids">
+          <div class="form-group">
+          <label>Documento del Huesped *</label>
+          <input type="text" class="form-control" formControlName="documento_huesped" placeholder="Carnet de identidad">
+          @if (formulario.get('documento_huesped')?.invalid && formulario.get('documento_huesped')?.touched) {
+            <span class="text-error">El Carnet es obligatorio.</span>
+          }
+        </div>
+        </div>
+
+        <div class="form-group">
+          <label>Fecha de Ingreso *</label>
+          <input type="date" class="form-control" formControlName="fecha_ingreso">
+        </div>
+
+        <div class="form-group">
+          <label>Fecha de Salida *</label>
+          <input type="date" class="form-control" formControlName="fecha_salida">
+        </div>
+      </div>
+
+      <div class="form-columna">
+        <div class="form-group">
+          <label>Tipo de Habitacion*</label>
+          <select class="form-control" formControlName="tipo_habitacion" (change)="onTipoChange($event)">
+            <option value="">- Seleccione un tipo -</option>
+            @for (tipo of tiposDisponibles; track tipo.tipo) {
+              <option [value]="tipo.tipo">{{ tipo.tipo }}</option>
+            }
+          </select>
+        </div>
+
+        @if (caracteristicasHabitacion) {
+          <div class="panel-factory">
+            <h4>Características de la hab.</h4>
+            <ul>
+              <li><strong>Capacidad:</strong> {{ caracteristicasHabitacion.capacidad }} personas</li>
+              <li><strong>Precio base:</strong> Bs.{{ caracteristicasHabitacion.precio_base }} por noche</li>
+              <li><strong>Descripcion:</strong> {{ caracteristicasHabitacion.descripcion }}</li>
+            </ul>
+          </div>
+        }
+
+        <div class="form-group" style="margin-top: 20px;">
+          <label>Cantidad de Personas *</label>
+          <input type="number" class="form-control" formControlName="cantidad_personas" placeholder="cant. personas">
+        </div>
+      </div>
+    </div>
+
+    @if (msjExito) {
+      <div class="alerta alerta-exito">{{ msjExito }}</div>
+    }
+    @if (msjError) {
+      <div class="alerta alerta-error">{{ msjError }}</div>
+    }
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="carga || !caracteristicasHabitacion">
+        {{ carga ? 'Procesando' : 'Confirmar Reserva' }}
+      </button>
+    </div>
+
+  </form>
+</div>
