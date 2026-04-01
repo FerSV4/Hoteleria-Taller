@@ -10,16 +10,12 @@ export class ApiService {
 
   constructor(private http: HttpClient) { }
 
-  // ==========================================
-  // HU-06: Contactos de servicios
-  // ==========================================
+// 6
   getContactos(): Observable<any> {
     return this.http.get(`${this.baseUrl}/contactos`);
   }
 
-  // ==========================================
-  // HU-01 y HU-10: Huéspedes
-  // ==========================================
+// 1 - 10
   registrarHuesped(datos: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/huespedes`, datos);
   }
@@ -28,9 +24,7 @@ export class ApiService {
     return this.http.get(`${this.baseUrl}/huespedes/${documento}`);
   }
 
-  // ==========================================
-  // HU-05: Habitaciones
-  // ==========================================
+// 5
   getTiposHabitacion(): Observable<any> {
     return this.http.get(`${this.baseUrl}/habitaciones/tipos`);
   }
@@ -39,9 +33,7 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}/habitaciones/seleccionar`, { tipo });
   }
 
-  // ==========================================
-  // HU-02, HU-03 y HU-04: Reservas
-  // ==========================================
+// 2-3-4
   crearReserva(datos: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/reservas`, datos);
   }

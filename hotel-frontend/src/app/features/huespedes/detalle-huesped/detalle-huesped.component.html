@@ -21,13 +21,13 @@
   }
 </div>
 
-@if (mensajeError) {
+@if (msjError) {
   <div class="estado-mensaje vacio" style="margin-top: 20px;">
-    <p>{{ mensajeError }}</p>
+    <p>{{ msjError }}</p>
   </div>
 }
 
-@if (huespedEncontrado) {
+@if (huespedUbicado) {
   <div class="tarjeta resultado-card">
     <div class="resultado-header">
       <h3>Datos del Huésped</h3>
@@ -36,19 +36,19 @@
     <div class="resultado-body">
       <div class="dato-grupo">
         <label>Nombre Completo</label>
-        <p>{{ huespedEncontrado.nombre_completo }}</p>
+        <p>{{ huespedUbicado.nombre_completo }}</p>
       </div>
       <div class="dato-grupo">
         <label>Documento de Identidad</label>
-        <p>{{ huespedEncontrado.documento }}</p>
+        <p>{{ huespedUbicado.documento }}</p>
       </div>
       <div class="dato-grupo">
         <label>Teléfono de Contacto</label>
-        <p>{{ huespedEncontrado.telefono || 'No registrado' }}</p>
+        <p>{{ huespedUbicado.telefono || 'No registrado' }}</p>
       </div>
       <div class="dato-grupo">
         <label>Correo Electrónico</label>
-        <p>{{ huespedEncontrado.correo || 'No registrado' }}</p>
+        <p>{{ huespedUbicado.correo || 'No registrado' }}</p>
       </div>
     </div>
   </div>

@@ -12,8 +12,8 @@ import { ApiService } from '../../../core/services/api.service';
 export class DetalleHuespedComponent {
   buscadorControl = new FormControl('', [Validators.required]);
   
-  huespedEncontrado: any = null;
-  mensajeError: string = '';
+  huespedUbicado: any = null;
+  msjError: string = '';
   cargando: boolean = false;
 
   constructor(private apiService: ApiService) {}
@@ -25,21 +25,21 @@ export class DetalleHuespedComponent {
     }
 
     this.cargando = true;
-    this.huespedEncontrado = null;
-    this.mensajeError = '';
+    this.huespedUbicado = null;
+    this.msjError = '';
 
     const documento = this.buscadorControl.value as string;
 
     this.apiService.getHuespedPorDocumento(documento).subscribe({
       next: (res) => {
-        this.huespedEncontrado = res.data;
+        this.huespedUbicado = res.data;
         this.cargando = false;
       },
       error: (err) => {
         if (err.status === 404) {
-          this.mensajeError = err.error?.mensaje || 'No hay huespedes con ese carnet.';
+          this.msjError = err.error?.mensaje || 'No hay huespedes con ese carnet.';
         } else {
-          this.mensajeError = 'Error con la DB.';
+          this.msjError = 'Error con la DB.';
         }
         this.cargando = false;
       }
