@@ -24,7 +24,7 @@ const crearReserva = async (datosReserva) => {
         throw new Error('HABITACION_NO_EXISTE');
     }
 
-    // Aqui se delega esa regla de las fechas a la nueva funcion 
+    // Aqui se delega esa regla de las fechas y capacidad a la nueva funcion 
     validarReglaFechaCapacidad(ingreso, salida, cantidad_personas, habitacion.capacidad);
 
     const reservaExistente = await prisma.reserva.findFirst({
