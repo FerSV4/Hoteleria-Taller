@@ -7,18 +7,18 @@ jest.mock('../config/db', () => ({
     reserva: { findFirst: jest.fn(), create: jest.fn() }
 }));
 
-describe('Prueba de logica N.1 - Reservas', () => {
+describe('Prueba de las reglas de negocio - Reservas', () => {
     
-    it('debe lanzar error CAPACIDAD_EXCEDIDA si hay más personas que capacidad', async () => {
+    it('El servicio debe indicar error por CAPACIDAD_EXCEDIDA', async () => {
         // Arrg: Hab. para 2 p
-        prisma.habitacion.findUnique.mockResolvedValue({ id: 1, capacidad: 2 });
+        prisma.habitacion.findUnique.mockResolvedValue({ id: 2, capacidad: 2 });
 
         const datosReserva = {
             huesped_id: 1,
-            habitacion_id: 1,
-            fecha_ingreso: '2026-10-10',
-            fecha_salida: '2026-10-12',
-            cantidad_personas: 4 // Excedente
+            habitacion_id: 2,
+            fecha_ingreso: '2026-12-10',
+            fecha_salida: '2026-12-12',
+            cantidad_personas: 10 // Excedente, pruebo con 10
         };
 
         // AcAs: Servicio debe lanzar error por la capacidad...

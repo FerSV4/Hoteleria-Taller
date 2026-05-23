@@ -1,14 +1,20 @@
 const prisma = require('../config/db');
 
+const validarReglaFechaCapacidad = (ingreso, salida, cantidadPersonas, capacidadHabitacion) => {
+    if (salida <= ingreso) {
+        throw new Error('FECHAS_INVALIDAS');
+    }
+    if (cantidadPersonas > capacidadHabitacion) {
+        throw new Error('CAPACIDAD_EXCEDIDA');
+    }
+};
+
+// Este metodo crear reserva ahora tiene responsabilidad unica de su negocio (Antes tenia el problema de mixed responsibility)
 const crearReserva = async (datosReserva) => {
     const { huesped_id, habitacion_id, fecha_ingreso, fecha_salida, cantidad_personas } = datosReserva;
 
     const ingreso = new Date(fecha_ingreso);
     const salida = new Date(fecha_salida);
-
-        if (salida <= ingreso) {
-        throw new Error('FECHAS_INVALIDAS');
-    }
 
     const habitacion = await prisma.habitacion.findUnique({
         where: { id: habitacion_id }
@@ -18,9 +24,8 @@ const crearReserva = async (datosReserva) => {
         throw new Error('HABITACION_NO_EXISTE');
     }
 
-    if (cantidad_personas > habitacion.capacidad) {
-        throw new Error('CAPACIDAD_EXCEDIDA');
-    }
+    // Aqui se delega esa regla de las fechas a la nueva funcion 
+    validarReglaFechaCapacidad(ingreso, salida, cantidad_personas, habitacion.capacidad);
 
     const reservaExistente = await prisma.reserva.findFirst({
         where: {
@@ -113,5 +118,6 @@ const registrarCheckIn = async (idReserva) => {
 module.exports = {
     crearReserva,
     obtenerReservasActivasYFuturas,
-    registrarCheckIn
+    registrarCheckIn,
+    validarReglaFechaCapacidad
 };
