@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = Number(process.env.PORT) || 3000;
 
 app.use(cors());
 app.use(express.json()); 
@@ -24,6 +24,15 @@ app.get('/', (req, res) => {
   res.json({ mensaje: 'Servidor OK' });
 });
 
-app.listen(port, () => {
+const server = app.listen(port, '127.0.0.1', (error) => {
+  if (error) {
+    console.error(`No se pudo iniciar el servidor en el puerto ${port}:`, error.message);
+    process.exit(1);
+  }
+
   console.log(`Ejecucion en http://localhost:${port}`);
+});
+
+server.on('error', (error) => {
+  console.error(`Error del servidor en el puerto ${port}:`, error.message);
 });
