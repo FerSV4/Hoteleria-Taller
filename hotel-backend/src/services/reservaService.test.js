@@ -18,7 +18,7 @@ describe('Prueba de las reglas de negocio - Reservas', () => {
             habitacion_id: 2,
             fecha_ingreso: '2026-12-10',
             fecha_salida: '2026-12-12',
-            cantidad_personas: 10 // Excedente, pruebo con 10
+            cantidad_personas: 10 // Excedente, pruebo con 10 personas...
         };
 
         // AcAs: Servicio debe lanzar error por la capacidad...
