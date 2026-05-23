@@ -1,38 +1,40 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 
 @Component({
-  selector: 'app-lista-contactos',
-  standalone: true,
-  imports: [],
-  templateUrl: './lista-contactos.component.html',
-  styleUrl: './lista-contactos.component.css'
+selector: 'app-lista-contactos',
+standalone: true,
+imports: [],
+templateUrl: './lista-contactos.component.html',
+styleUrl: './lista-contactos.component.css'
 })
 export class ListaContactosComponent implements OnInit {
-  contactos: any[] = [];
-  mensajeVacio: string = '';
-  cargando: boolean = true;
+contactos: unknown[] = [];
 
-  constructor(private apiService: ApiService) {}
+mensajeVacio = '';
+cargando = true;
 
-  ngOnInit(): void {
-    this.cargarContactos();
-  }
+private apiService = inject(ApiService);
 
-  cargarContactos(): void {
-    this.apiService.getContactos().subscribe({
-      next: (respuesta) => {
-        this.contactos = respuesta.data;
-        if (this.contactos.length === 0) {
-          this.mensajeVacio = respuesta.mensaje; 
-        }
-        this.cargando = false;
-      },
-      error: (err) => {
-        console.error('Error al cargar:', err);
-        this.mensajeVacio = 'Error de carga.';
-        this.cargando = false;
-      }
-    });
-  }
+ngOnInit(): void {
+this.cargarContactos();
+}
+
+cargarContactos(): void {
+this.apiService.getContactos().subscribe({
+next: (respuesta: unknown) => {
+const res = respuesta as { data: unknown[], mensaje: string };
+this.contactos = res.data;
+if (this.contactos.length === 0) {
+this.mensajeVacio = res.mensaje;
+}
+this.cargando = false;
+},
+error: (err: unknown) => {
+console.error('Error al cargar:', err);
+this.mensajeVacio = 'Error de carga.';
+this.cargando = false;
+}
+});
+}
 }
