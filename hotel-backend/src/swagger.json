@@ -1,14 +1,34 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "API de Hotelería",
+    "title": "API de Hotelería - ISW",
     "version": "1.0.0",
-    "description": "Documentación endpoints hotel"
+    "description": "Documentación endpoints Hoteleria"
   },
   "paths": {
     "/api/habitaciones/tipos": {
       "get": {
-        "summary": "Obtener lista de habitaciones",
+        "summary": "Obtener tipos de habitaciones disponibles",
+        "tags": ["Habitaciones"],
+        "responses": {
+          "200": { "description": "OK" },
+          "500": { "description": "Error del servidor" }
+        }
+      }
+    },
+    "/api/reservas/activas": {
+      "get": {
+        "summary": "Obtener lista de reservas activas y futuras",
+        "tags": ["Reservas"],
+        "responses": {
+          "200": { "description": "OK" }
+        }
+      }
+    },
+    "/api/contactos": {
+      "get": {
+        "summary": "Obtener lista de contactos de servicios",
+        "tags": ["Contactos"],
         "responses": {
           "200": { "description": "OK" }
         }
