@@ -114,10 +114,13 @@ const registrarCheckIn = async (idReserva) => {
     return reservaActualizada;
 };
 
-
+const cancelarReserva = async (idReserva) => {
+    // Vacio en este caso pa la prueba tdd
+};
 module.exports = {
     crearReserva,
     obtenerReservasActivasYFuturas,
     registrarCheckIn,
-    validarReglaFechaCapacidad
+    validarReglaFechaCapacidad,
+    cancelarReserva
 };

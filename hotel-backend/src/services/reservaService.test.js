@@ -1,4 +1,4 @@
-const { crearReserva } = require('./reservaService');
+const { crearReserva, cancelarReserva } = require('./reservaService');
 const prisma = require('../config/db');
 
 // Mock de prisma...
@@ -25,5 +25,15 @@ describe('Prueba de las reglas de negocio - Reservas', () => {
         await expect(crearReserva(datosReserva)).rejects.toThrow('CAPACIDAD_EXCEDIDA');
         
         expect(prisma.reserva.create).not.toHaveBeenCalled();
+    });
+
+    it('El servicio tiene que rechazar una reserva ya cancelada', async () => {
+        // Arrg: aqui simulo que la reserva esta cancelada...
+        prisma.reserva.findUnique = jest.fn().mockResolvedValue({ id: 99, estado: 'Cancelada' });
+        prisma.reserva.update = jest.fn();
+
+        // Ac-As: Se reintenta cancelar cuando ya esta cancelada..
+        await expect(cancelarReserva(99)).rejects.toThrow('RESERVA_YA_CANCELADA');
+        expect(prisma.reserva.update).not.toHaveBeenCalled();
     });
 });
