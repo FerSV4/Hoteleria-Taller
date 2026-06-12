@@ -321,8 +321,8 @@ Mínimo 3 nuevos (adicionales a los del EC2).
 | # | Tipo | Commit | Descripción |
 |---|---|---|---|
 | 1 | [Magic Strings] | [`b1b4d29`](https://github.com/FerSV4/Hoteleria-Taller/commit/b1b4d29881ccc5f135e76f32f388a51c6899d916) | [Antes las sentencias de los estados eran muy redundantes en varias partes del codigo, ahora estan en un enum y llamadas de forma correcta donde se la necesita ] |
-| 2 | [Tipo] | [`b2c3d4e`](https://github.com/usuario/repo/commit/b2c3d4e) | [Antes: X → Después: Y] |
-| 3 | [Tipo] | [`c3d4e5f`](https://github.com/usuario/repo/commit/c3d4e5f) | [Antes: X → Después: Y] |
+| 2 | [Parametros agrupados] | [`99abf12`](https://github.com/FerSV4/Hoteleria-Taller/commit/99abf12c5f2d770d6945334eac7508ce61c8b51d) | [Antes se tenia el mal uso de la recepcion de los parametros, 4 parametros sueltos, siendo que lo mejor en este caso es que pasen como un objeto simulando un dto.] |
+| 3 | [Parseo inconcistente] | [`4937aaa`](https://github.com/FerSV4/Hoteleria-Taller/commit/4937aaaeff664d8b49525b72e5af877ff6585233) | [Antes se recibia el idreserva de forma cruda, ahora se le hace el casteo que permite flexibilidad en caso que se mande el id como string.] |
 
 ### Detalle — Smell 1: [Magic Strings]
 
@@ -368,15 +368,62 @@ const ESTADOS_RESERVA = {
 
 ---
 
-### Detalle — Smell 2: [Tipo]
+### Detalle — Smell 2: [Parametros agrupados]
 
-> Mismo formato.
+**Código antes:**
+```csharp / typescript
+const validarReglaFechaCapacidad = (ingreso, salida, cantidadPersonas, capacidadHabitacion) => {
+    validarReglaFechaCapacidad(ingreso, salida, cantidad_personas, habitacion.capacidad);
+
+```
+
+**Código después:**
+```csharp / typescript
+const validarReglaFechaCapacidad = ({ ingreso, salida, cantidadPersonas, capacidadHabitacion }) => {
+    if (salida <= ingreso) {
+        throw new Error('FECHAS_INVALIDAS');
+    }
+    if (cantidadPersonas > capacidadHabitacion) {
+        throw new Error('CAPACIDAD_EXCEDIDA');
+    }
+};
+    validarReglaFechaCapacidad({
+    ingreso, 
+    salida, 
+    cantidadPersonas: cantidad_personas, 
+    capacidadHabitacion: habitacion.capacidad
+
+```
 
 ---
 
-### Detalle — Smell 3: [Tipo]
+### Detalle — Smell 3: [Parseo inconcistente]
 
-> Mismo formato.
+**Código antes:**
+```csharp / typescript
+const cancelarReserva = async (idReserva) => {
+    const reserva = await prisma.reserva.findUnique({
+        where: { id: idReserva },
+        select: { estado: true }
+    });
+
+```
+
+**Código después:**
+```csharp / typescript
+const cancelarReserva = async (idReserva) => {
+    const parsedId = parseInt(idReserva, 10);
+    const reserva = await prisma.reserva.findUnique({
+        where: { id: parsedId },
+        select: { estado: true }
+    });
+    
+    return await prisma.reserva.update({
+        where: { id: parsedId },
+        data: { estado: ESTADOS_RESERVA.CANCELADA }
+    });
+};
+```
 
 ---
 
@@ -384,37 +431,81 @@ const ESTADOS_RESERVA = {
 
 | # | Historia de Usuario | Criterio de Aceptación | Prueba que valida ese CA | Commit |
 |---|---|---|---|---|
-| 1 | [HU título] | [Dado/Cuando/Entonces] | [NombrePrueba_Escenario_Resultado] | [`a1b2c3d`](https://github.com/usuario/repo/commit/a1b2c3d) |
-| 2 | [HU título] | [Dado/Cuando/Entonces] | [NombrePrueba_Escenario_Resultado] | [`b2c3d4e`](https://github.com/usuario/repo/commit/b2c3d4e) |
-| 3 | [HU título] | [Dado/Cuando/Entonces] | [NombrePrueba_Escenario_Resultado] | [`c3d4e5f`](https://github.com/usuario/repo/commit/c3d4e5f) |
+| 1 | [HU-05 Gestión de Reservas] | [Dado una cancelacion cuando la reserva ya fue cancelada, entonces se debe evitar la accion.] | [El servicio tiene que rechazar una reserva ya cancelada] | [`36a7106`](https://github.com/FerSV4/Hoteleria-Taller/commit/36a7106d6dc3526eae0813790b35ffda65d04004) |
+| 2 | [HU-04 Registrar check in] | [Dado que una reserva ya tiene check in, si el usuario intenta realizarlo de nuevo, el sistema no lo debe permitir] | [Se debe evitar que se haga un checkin cuando ya la reseva anda en curso] | [`7a1bf6e`](https://github.com/FerSV4/Hoteleria-Taller/commit/7a1bf6e0c0a8a996ed2177b0b69058acf2c031ea) |
+| 3 | [HU-01 Registrar huesped] | [Dado que ya existe un huésped con el mismo documento de identidad, cuando se intente registrar nuevamente, entonces el sistema debe impedir el duplicado.] | [No se debe permitir regist. un huesped con Ci duplicado] | [`6ae2c3c`](https://github.com/FerSV4/Hoteleria-Taller/commit/6ae2c3c7c22ee6ee8de23de8ba5ba76291f51a4e) |
 
-### Cadena 1 — [Nombre HU]
+### Cadena 1 — [HU-05 Gestión de Reservas]
 
 **Historia de Usuario:**
-> Como [rol] quiero [acción] para [beneficio]
+> Como recepcionista quiero cancelar una reserva existente para que la habitacione ste libre, pero el sistema debe impedir cancelar una reserva que ya fue cancelada.
 
 **Criterio de Aceptación elegido:**
-> Dado [contexto] / Cuando [acción] / Entonces [resultado esperado]
+> Dado una cancelacion cuando la reserva ya fue cancelada, entonces se debe evitar la accion.
 
 **Prueba que valida este CA:**
 ```csharp / typescript
-[Fact / test]
-public void Metodo_Escenario_ResultadoEsperado()
-{
-    // Arrange — setup del contexto del CA
-    // Act — ejecutar la acción del CA
-    // Assert — verificar el resultado del CA
-}
+it('El servicio tiene que rechazar una reserva ya cancelada', async () => {
+        // Arrg: aqui simulo que la reserva esta cancelada...
+        prisma.reserva.findUnique = jest.fn().mockResolvedValue({ id: 99, estado: 'Cancelada' });
+        prisma.reserva.update = jest.fn();
+
+        // Ac-As: Se reintenta cancelar cuando ya esta cancelada..
+        await expect(cancelarReserva(99)).rejects.toThrow('RESERVA_YA_CANCELADA');
+        expect(prisma.reserva.update).not.toHaveBeenCalled();
+    });
 ```
 
 ---
 
-### Cadena 2 — [Nombre HU]
+### Cadena 2 — [HU-04 Registrar check in]
 
-> Mismo formato.
+**Historia de Usuario:**
+> Como recepcionista quiero registrar el check in de una reserva existente para marcar el ingreso del huesped al hotel.
+
+**Criterio de Aceptación elegido:**
+> Dado que una reserva ya realizo check in, cuando el usuario intente registrarlo de nuevo, entonces el sistema debe evitar que se rehaga la accion.
+
+**Prueba que valida este CA:**
+```csharp / typescript
+it('Se debe evitar que se haga un checkin cuando ya la reseva anda en curso', async () => {
+        // Arrg: Mockea una reserva en curso... para esta prueba
+        prisma.reserva.findUnique = jest.fn().mockResolvedValue({ id: 50, estado: 'En curso' });
+        prisma.reserva.update = jest.fn();
+
+        // Ac--As: Aqui intento darle un re checkin, lo cual esta mal...
+        await expect(registrarCheckIn(50)).rejects.toThrow('RESERVA_YA_TIENE_CHECKIN');
+        
+        expect(prisma.reserva.update).not.toHaveBeenCalled();
+    });
+```
 
 ---
 
-### Cadena 3 — [Nombre HU]
+### Cadena 3 — [HU-01 Registrar huesped]
 
-> Mismo formato.
+**Historia de Usuario:**
+> Como recepcionista quiero registrar los datos básicos de un huésped para poder usar su información al momento de realizar reservas.
+
+**Criterio de Aceptación elegido:**
+> Dado que ya existe un huésped con el mismo documento de identidad, cuando se intente registrar nuevamente, entonces el sistema debe impedir el duplicado.
+
+**Prueba que valida este CA:**
+```csharp / typescript
+it('No se debe permitir regist. un huesped con Ci duplicado', async () => {
+        // Arrg: Creamos el usuario falso con el ci y demas...
+        prisma.huesped.findUnique.mockResolvedValue({ id: 1, documento: '90902331' });
+        prisma.huesped.create = jest.fn();
+
+        const datosHuesped = {
+            nombre_completo: 'Yan pol',
+            documento: '90902331',
+            telefono: '85777132'
+        };
+
+        // Ac--As: Aqui ya intentamos el registro, pero nos tiene que botar error de duplicado...
+        await expect(registrarHuesped(datosHuesped)).rejects.toThrow('DUPLICADO');
+        
+        expect(prisma.huesped.create).not.toHaveBeenCalled();
+    });
+```
