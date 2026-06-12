@@ -88,8 +88,10 @@ const obtenerReservasActivasYFuturas = async () => {
 };
 
 const registrarCheckIn = async (idReserva) => {
+    const parsedId = parseInt(idReserva);
     const reserva = await prisma.reserva.findUnique({
-        where: { id: parseInt(idReserva) }
+        where: { id: parsedId },
+        select: { estado: true }
     });
 
     if (!reserva) {
@@ -100,12 +102,13 @@ const registrarCheckIn = async (idReserva) => {
         throw new Error('RESERVA_CANCELADA');
     }
 
+    //Validacion de checkin, despues del retro...tdd
     if (reserva.estado === 'En curso') {
         throw new Error('CHECKIN_DUPLICADO');
     }
 
     const reservaActualizada = await prisma.reserva.update({
-        where: { id: parseInt(idReserva) },
+        where: { id: parsedId },
         data: {
             estado: 'En curso'
         }
