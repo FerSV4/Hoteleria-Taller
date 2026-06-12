@@ -115,7 +115,13 @@ const registrarCheckIn = async (idReserva) => {
 };
 
 const cancelarReserva = async (idReserva) => {
-    // Vacio en este caso pa la prueba tdd
+    const reserva = await prisma.reserva.findUnique({
+        where: { id: idReserva }
+    });
+
+    if (reserva && reserva.estado === 'Cancelada') {
+        throw new Error('RESERVA_YA_CANCELADA');
+    }
 };
 module.exports = {
     crearReserva,
