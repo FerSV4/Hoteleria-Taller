@@ -8,7 +8,7 @@
   "paths": {
     "/api/habitaciones/tipos": {
       "get": {
-        "summary": "Obtener tipos de habitaciones disponibles",
+        "summary": "Obtener tipos de habitaciones existentes",
         "tags": ["Habitaciones"],
         "responses": {
           "200": { "description": "OK" },
@@ -16,9 +16,9 @@
         }
       }
     },
-    "/api/reservas/activas": {
+    "/api/reservas/": {
       "get": {
-        "summary": "Obtener lista de reservas activas y futuras",
+        "summary": "Obtener lista de reservas globales",
         "tags": ["Reservas"],
         "responses": {
           "200": { "description": "OK" }
@@ -27,7 +27,7 @@
     },
     "/api/contactos": {
       "get": {
-        "summary": "Obtener lista de contactos de servicios",
+        "summary": "Obtener lista de contactos (servicios hotel)",
         "tags": ["Contactos"],
         "responses": {
           "200": { "description": "OK" }
