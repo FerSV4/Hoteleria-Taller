@@ -5,9 +5,9 @@ const registrarHuesped = async (datosHuesped) => {
         where: { documento: datosHuesped.documento }
     });
 
-    //if (huespedExistente) {
-    //    throw new Error('DUPLICADO');
-    //}
+    if (huespedExistente) {
+        throw new Error('DUPLICADO');
+    }
 
     const nuevoHuesped = await prisma.huesped.create({
         data: datosHuesped
