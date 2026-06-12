@@ -1,4 +1,4 @@
-const { crearReserva, cancelarReserva } = require('./reservaService');
+const { crearReserva, cancelarReserva, registrarCheckIn } = require('./reservaService');
 const prisma = require('../config/db');
 
 // Mock de prisma...
@@ -43,7 +43,7 @@ describe('Prueba de las reglas de negocio - Reservas', () => {
         prisma.reserva.update = jest.fn();
 
         // Ac--As: Aqui intento darle un re checkin, lo cual esta mal...
-        await expect(registrarCheckIn(50)).rejects.toThrow('RESERVA_YA_TIENE_CHECKIN');
+        await expect(registrarCheckIn(50)).rejects.toThrow('CHECKIN_DUPLICADO');
         
         expect(prisma.reserva.update).not.toHaveBeenCalled();
     });

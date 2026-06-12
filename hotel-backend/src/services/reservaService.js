@@ -100,9 +100,9 @@ const registrarCheckIn = async (idReserva) => {
         throw new Error('RESERVA_CANCELADA');
     }
 
-    //if (reserva.estado === 'En curso') {
-     //   throw new Error('CHECKIN_DUPLICADO');
-    //}
+    if (reserva.estado === 'En curso') {
+        throw new Error('CHECKIN_DUPLICADO');
+    }
 
     const reservaActualizada = await prisma.reserva.update({
         where: { id: parseInt(idReserva) },
