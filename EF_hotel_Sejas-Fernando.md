@@ -304,11 +304,11 @@ const registrarHuesped = async (datosHuesped) => {
 
 ### Cobertura final
 
-**Cobertura alcanzada:** X%
+**Cobertura alcanzada:** 61.11%
 
 > Captura del reporte de cobertura final:
 
-![Cobertura final](capturas/[proyecto]-cobertura-final.png)
+![Cobertura final](capturas/hotel-cobertura-final.png)
 
 > Si la cobertura es <50%, pegar aquí la justificación enviada al docente:
 
@@ -320,20 +320,50 @@ Mínimo 3 nuevos (adicionales a los del EC2).
 
 | # | Tipo | Commit | Descripción |
 |---|---|---|---|
-| 1 | [Tipo] | [`a1b2c3d`](https://github.com/usuario/repo/commit/a1b2c3d) | [Antes: X → Después: Y] |
+| 1 | [Magic Strings] | [`b1b4d29`](https://github.com/FerSV4/Hoteleria-Taller/commit/b1b4d29881ccc5f135e76f32f388a51c6899d916) | [Antes las sentencias de los estados eran muy redundantes en varias partes del codigo, ahora estan en un enum y llamadas de forma correcta donde se la necesita ] |
 | 2 | [Tipo] | [`b2c3d4e`](https://github.com/usuario/repo/commit/b2c3d4e) | [Antes: X → Después: Y] |
 | 3 | [Tipo] | [`c3d4e5f`](https://github.com/usuario/repo/commit/c3d4e5f) | [Antes: X → Después: Y] |
 
-### Detalle — Smell 1: [Tipo]
+### Detalle — Smell 1: [Magic Strings]
 
 **Código antes:**
 ```csharp / typescript
-// código con el smell
+const prisma = require('../config/db');
+
+
+const validarReglaFechaCapacidad = (ingreso, salida, cantidadPersonas, capacidadHabitacion) => {
+    if (salida <= ingreso) {
+        throw new Error('FECHAS_INVALIDAS');
+    }
+    if (cantidadPersonas > capacidadHabitacion) {
+        throw new Error('CAPACIDAD_EXCEDIDA');
+    }
+};
+
 ```
 
 **Código después:**
 ```csharp / typescript
-// código corregido
+const prisma = require('../config/db');
+
+const ESTADOS_RESERVA = {
+    RESERVADA: 'Reservada',
+    EN_CURSO: 'En curso',
+    CANCELADA: 'Cancelada'
+};
+
+    if (!reserva) {
+        throw new Error('RESERVA_NO_ENCONTRADA');
+    }
+
+    if (reserva.estado === ESTADOS_RESERVA.CANCELADA) {
+        throw new Error('RESERVA_CANCELADA');
+    }
+
+    //Validacion de checkin, despues del retro...tdd
+    if (reserva.estado === ESTADOS_RESERVA.EN_CURSO) {
+        throw new Error('CHECKIN_DUPLICADO');
+    }
 ```
 
 ---

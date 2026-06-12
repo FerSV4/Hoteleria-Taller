@@ -6,7 +6,7 @@ const ESTADOS_RESERVA = {
     CANCELADA: 'Cancelada'
 };
 
-const validarReglaFechaCapacidad = (ingreso, salida, cantidadPersonas, capacidadHabitacion) => {
+const validarReglaFechaCapacidad = ({ ingreso, salida, cantidadPersonas, capacidadHabitacion }) => {
     if (salida <= ingreso) {
         throw new Error('FECHAS_INVALIDAS');
     }
@@ -31,7 +31,12 @@ const crearReserva = async (datosReserva) => {
     }
 
     // Aqui se delega esa regla de las fechas y capacidad a la nueva funcion 
-    validarReglaFechaCapacidad(ingreso, salida, cantidad_personas, habitacion.capacidad);
+    validarReglaFechaCapacidad({
+    ingreso, 
+    salida, 
+    cantidadPersonas: cantidad_personas, 
+    capacidadHabitacion: habitacion.capacidad
+});
 
     const reservaExistente = await prisma.reserva.findFirst({
         where: {
