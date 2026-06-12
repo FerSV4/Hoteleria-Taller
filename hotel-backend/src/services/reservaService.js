@@ -129,9 +129,10 @@ const registrarCheckIn = async (idReserva) => {
 };
 
 const cancelarReserva = async (idReserva) => {
+    const parsedId = parseInt(idReserva, 10);
     //refactor en este caso es verificar el estado antes de intentar actualizarla.
     const reserva = await prisma.reserva.findUnique({
-        where: { id: idReserva },
+        where: { id: parsedId },
         select: { estado: true }
     });
 
@@ -139,13 +140,13 @@ const cancelarReserva = async (idReserva) => {
         throw new Error('RESERVA_NO_EXISTE');
     }
 
-    if (reserva.estado === 'Cancelada') {
+    if (reserva.estado === ESTADOS_RESERVA.CANCELADA) {
         throw new Error('RESERVA_YA_CANCELADA');
     }
     
     return await prisma.reserva.update({
-        where: { id: idReserva },
-        data: { estado: 'Cancelada' }
+        where: { id: parsedId },
+        data: { estado: ESTADOS_RESERVA.CANCELADA }
     });
 };
 module.exports = {
