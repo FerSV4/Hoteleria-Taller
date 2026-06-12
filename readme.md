@@ -63,3 +63,8 @@ Se debe tener node, postgre y angular
    ng serve
    ```
 4. Se abre el navegador
+
+
+
+### Comando coverage en backend
+npm run test:coverage

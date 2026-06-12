@@ -116,14 +116,190 @@ const cancelarReserva = async (idReserva) => {
 
 ### Ciclo TDD — Prueba 2
 
-> Mismo formato. Incluir al menos 3 ciclos TDD completos.
+**HU:** [HU-04] [Registrar check in]
+> Como recepcionista quiero registrar el check in de una reserva existente para marcar el ingreso del huesped al hotel.
 
+**CA elegido:** [Dado que una reserva ya realizo check in, cuando el usuario intente registrarlo de nuevo, entonces el sistema debe evitar que se rehaga la accion.]
+
+**Commit 1 — Rojo** [`7a1bf6e`](https://github.com/FerSV4/Hoteleria-Taller/commit/7a1bf6e0c0a8a996ed2177b0b69058acf2c031ea):
+```
+test: [HU-04] agregar prueba que evita el doble checkin.
+
+```
+Test escrito (sin el código que lo pase aún):
+```csharp / typescript
+it('Se debe evitar que se haga un checkin cuando ya la reseva anda en curso', async () => {
+        // Arrg: Mockea una reserva en curso... para esta prueba
+        prisma.reserva.findUnique = jest.fn().mockResolvedValue({ id: 50, estado: 'En curso' });
+        prisma.reserva.update = jest.fn();
+
+        // Ac--As: Aqui intento darle un re checkin, lo cual esta mal...
+        await expect(registrarCheckIn(50)).rejects.toThrow('RESERVA_YA_TIENE_CHECKIN');
+        
+        expect(prisma.reserva.update).not.toHaveBeenCalled();
+    });
+```
+> Captura del test fallando o error de compilación:
+
+![Test rojo](capturas/hotel-tdd2-rojo.png)
+
+---
+
+**Commit 2 — Verde** [`a1be3cc`](https://github.com/FerSV4/Hoteleria-Taller/commit/a1be3ccd55906d298cea8dafae50735c9b11abd5):
+```
+feat: [HU-04] Validacion de no re checkin - retro
+
+```
+Código mínimo para hacer pasar el test:
+```csharp / typescript
+const registrarCheckIn = async (idReserva) => {
+    const reserva = await prisma.reserva.findUnique({
+        where: { id: parseInt(idReserva) }
+    });
+
+        if (reserva.estado === 'En curso') {
+        throw new Error('CHECKIN_DUPLICADO');
+    }
+```
+
+> Captura del test pasando:
+
+![Test verde](capturas/hotel-tdd2-verde.png)
+
+---
+
+**Commit 3 — Refactor** [`d8c4ea5`](https://github.com/FerSV4/Hoteleria-Taller/commit/d8c4ea596b888df8ab57f55c0be22a25db6579f6):
+```
+refactor: [HU-04] mejora de la funcion, menor redundacia del parse y se aclara el estado desde la db
+```
+Cambios aplicados:
+```csharp / typescript
+const registrarCheckIn = async (idReserva) => {
+    const parsedId = parseInt(idReserva);
+    const reserva = await prisma.reserva.findUnique({
+        where: { id: parsedId },
+        select: { estado: true }
+    });
+
+    if (!reserva) {
+        throw new Error('RESERVA_NO_ENCONTRADA');
+    }
+
+    if (reserva.estado === 'Cancelada') {
+        throw new Error('RESERVA_CANCELADA');
+    }
+
+    //Validacion de checkin, despues del retro...tdd
+    if (reserva.estado === 'En curso') {
+        throw new Error('CHECKIN_DUPLICADO');
+    }
+
+    const reservaActualizada = await prisma.reserva.update({
+        where: { id: parsedId },
+        data: {
+            estado: 'En curso'
+        }
+    });
+
+    return reservaActualizada;
+};
+```
+
+> Captura del test aún pasando después del refactor:
+
+![Test post-refactor](capturas/hotel-tdd2-refactor.png)
 ---
 
 ### Ciclo TDD — Prueba 3
 
-> Mismo formato.
+**HU:** [HU-01] [Registrar huésped]
+> Como recepcionista quiero registrar los datos básicos de un huésped para poder usar su información al momento de realizar reservas.
 
+**CA elegido:** [Dado que ya existe un huésped con el mismo documento de identidad, cuando se intente registrar nuevamente, entonces el sistema debe impedir el duplicado.]
+
+**Commit 1 — Rojo** [`6ae2c3c`](https://github.com/FerSV4/Hoteleria-Taller/commit/6ae2c3c7c22ee6ee8de23de8ba5ba76291f51a4e):
+```
+test: [HU-01] agregar prueba, evitar huespedes duaplicados
+```
+Test escrito (sin el código que lo pase aún):
+```csharp / typescript
+describe('Pruebas de reglas de negocio en serv. Huespedes', () => {
+    
+    it('No se debe permitir regist. un huesped con Ci duplicado', async () => {
+        // Arrg: Creamos el usuario falso con el ci y demas...
+        prisma.huesped.findUnique.mockResolvedValue({ id: 1, documento: '90902331' });
+        prisma.huesped.create = jest.fn();
+
+        const datosHuesped = {
+            nombre_completo: 'Yan pol',
+            documento: '90902331',
+            telefono: '85777132'
+        };
+
+        // Ac--As: Aqui ya intentamos el registro, pero nos tiene que botar error de duplicado...
+        await expect(registrarHuesped(datosHuesped)).rejects.toThrow('DUPLICADO');
+        
+        expect(prisma.huesped.create).not.toHaveBeenCalled();
+    });
+```
+
+> Captura del test fallando o error de compilación:
+
+![Test rojo](capturas/hotel-tdd3-rojo.png)
+
+---
+
+**Commit 2 — Verde** [`b0c8ab6`](https://github.com/FerSV4/Hoteleria-Taller/commit/b0c8ab687a683bf33a39cf8e8649a54f20778d94):
+```
+feat: [HU-01] se activa la verif. del duplicado, prueba correcta
+```
+Código mínimo para hacer pasar el test:
+```csharp / typescript
+const registrarHuesped = async (datosHuesped) => {
+    const huespedExistente = await prisma.huesped.findUnique({
+        where: { documento: datosHuesped.documento }
+    });
+
+        if (huespedExistente) {
+        throw new Error('DUPLICADO');
+    }
+        const nuevoHuesped = await prisma.huesped.create({
+        data: datosHuesped
+    });
+
+    return nuevoHuesped;
+};
+```
+
+> Captura del test pasando:
+
+![Test verde](capturas/hotel-tdd3-verde.png)
+
+---
+
+**Commit 3 — Refactor** [`c098e78`](https://github.com/FerSV4/Hoteleria-Taller/commit/c098e785ad425593cf146d4dadc5a43a6b7b639a):
+```
+refactor: [HU-01] mejora de la sentencia de supa y la funcion mas eficiente
+
+```
+Cambios aplicados:
+```csharp / typescript
+const registrarHuesped = async (datosHuesped) => {
+    //En este refactor mejoramos la funcion  del registro, trayendo solo el id, para verif si existe o no.
+    const huespedExistente = await prisma.huesped.findUnique({
+        where: { documento: datosHuesped.documento },
+        select: { id: true }
+    });
+
+    if (huespedExistente) {
+        throw new Error('DUPLICADO');
+    }
+
+```
+
+> Captura del test aún pasando después del refactor:
+
+![Test post-refactor](capturas/hotel-tdd3-refactor.png)
 ---
 
 ### Cobertura final

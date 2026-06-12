@@ -1,5 +1,11 @@
 const prisma = require('../config/db');
 
+const ESTADOS_RESERVA = {
+    RESERVADA: 'Reservada',
+    EN_CURSO: 'En curso',
+    CANCELADA: 'Cancelada'
+};
+
 const validarReglaFechaCapacidad = (ingreso, salida, cantidadPersonas, capacidadHabitacion) => {
     if (salida <= ingreso) {
         throw new Error('FECHAS_INVALIDAS');
@@ -49,7 +55,7 @@ const crearReserva = async (datosReserva) => {
             fecha_ingreso: ingreso,
             fecha_salida: salida,
             cantidad_personas,
-            estado: 'Reservada'
+            estado: ESTADOS_RESERVA.RESERVADA
         }
     });
 
@@ -98,19 +104,19 @@ const registrarCheckIn = async (idReserva) => {
         throw new Error('RESERVA_NO_ENCONTRADA');
     }
 
-    if (reserva.estado === 'Cancelada') {
+    if (reserva.estado === ESTADOS_RESERVA.CANCELADA) {
         throw new Error('RESERVA_CANCELADA');
     }
 
     //Validacion de checkin, despues del retro...tdd
-    if (reserva.estado === 'En curso') {
+    if (reserva.estado === ESTADOS_RESERVA.EN_CURSO) {
         throw new Error('CHECKIN_DUPLICADO');
     }
 
     const reservaActualizada = await prisma.reserva.update({
         where: { id: parsedId },
         data: {
-            estado: 'En curso'
+            estado: ESTADOS_RESERVA.EN_CURSO
         }
     });
 
