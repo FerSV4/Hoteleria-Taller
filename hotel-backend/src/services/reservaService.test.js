@@ -36,4 +36,15 @@ describe('Prueba de las reglas de negocio - Reservas', () => {
         await expect(cancelarReserva(99)).rejects.toThrow('RESERVA_YA_CANCELADA');
         expect(prisma.reserva.update).not.toHaveBeenCalled();
     });
+
+    it('Se debe evitar que se haga un checkin cuando ya la reseva anda en curso', async () => {
+        // Arrg: Mockea una reserva en curso... para esta prueba
+        prisma.reserva.findUnique = jest.fn().mockResolvedValue({ id: 50, estado: 'En curso' });
+        prisma.reserva.update = jest.fn();
+
+        // Ac--As: Aqui intento darle un re checkin, lo cual esta mal...
+        await expect(registrarCheckIn(50)).rejects.toThrow('RESERVA_YA_TIENE_CHECKIN');
+        
+        expect(prisma.reserva.update).not.toHaveBeenCalled();
+    });
 });
