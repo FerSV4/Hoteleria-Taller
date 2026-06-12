@@ -1,0 +1,18 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API de Hotelería",
+    "version": "1.0.0",
+    "description": "Documentación endpoints hotel"
+  },
+  "paths": {
+    "/api/habitaciones/tipos": {
+      "get": {
+        "summary": "Obtener lista de habitaciones",
+        "responses": {
+          "200": { "description": "OK" }
+        }
+      }
+    }
+  }
+}

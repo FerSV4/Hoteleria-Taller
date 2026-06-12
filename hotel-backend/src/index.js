@@ -20,17 +20,20 @@ app.use('/api/huespedes', huespedRoutes);
 app.use('/api/habitaciones', habitacionRoutes);
 app.use('/api/reservas', reservaRoutes);
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 app.get('/', (req, res) => {
   res.json({ mensaje: 'Servidor OK' });
 });
 
-const server = app.listen(port, '127.0.0.1', (error) => {
+const server = app.listen(port, (error) => {
   if (error) {
     console.error(`No se pudo iniciar el servidor en el puerto ${port}:`, error.message);
     process.exit(1);
   }
-
-  console.log(`Ejecucion en http://localhost:${port}`);
+  console.log(`Ejecucion en el puerto ${port}`);
 });
 
 server.on('error', (error) => {
